@@ -1,0 +1,48 @@
+open System
+open System.Text.RegularExpressions
+
+type Action=
+    | Print of string
+    | Save of string
+    | Compute of string
+
+let interpretColor color value=
+    match color with
+    | "red"->Print value
+    | "blue"->Save value
+    | "green"->Compute value
+    | _-> failwithf "Unknown color: %s" color
+
+let executeAction action=
+    match action with
+    | Print msg->printfn "Output: %s" msg
+    | Save filepath->printfn "Saving to: %s" filepath
+    | Compute expr-> 
+        printfn "Computing: %s" expr
+
+let interpretColors sequence=
+    sequence
+    |> Seq.iter (fun (color, value)->
+        let action=interpretColor color value
+        executeAction action)
+
+let parseCommands (input: string)=
+    let pattern= @"(?<color>red|blue|green)\s+(?<value>.+)"
+    let regex=Regex(pattern)
+    let matches=regex.Matches(input)
+    seq {
+        for m in matches do
+            let color = m.Groups.["color"].Value
+            let value = m.Groups.["value"].Value
+            yield (color,value)
+    }
+    
+[<EntryPoint>]
+let main argv=
+    let input= "red Hello, World!\nblue output.txt\ngreen 1 + 2"
+
+    let colorSequence=parseCommands input
+
+    interpretColors colorSequence
+    
+    0 
