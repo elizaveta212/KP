@@ -1,0 +1,29 @@
+open System
+
+type Action=
+    | Print of string
+    | Save of string
+    | Compute of string
+let interpretColor color value=
+    match color with
+    | "red"->Print value
+    | "blue"->Save value
+    | "green"->Compute value
+    | _->failwithf "Unknown color: %s" color
+let executeAction action=
+    match action with
+    | Print msg->printfn "Output: %s" msg
+    | Save filepath->printfn "Saving to: %s" filepath
+    | Compute expr-> 
+        printfn "Computing: %s" expr
+let interpretColors sequence=
+    sequence
+    |> Seq.iter(fun (color,value) ->
+        let action = interpretColor color value
+        executeAction action)
+[<EntryPoint>]
+let main argv=
+    let colorSequence= [("red", "Hello, World!"); ("blue", "output.txt"); ("green", "1 + 2")]
+    interpretColors colorSequence
+
+    0 
